@@ -4,6 +4,8 @@
 void setup() {
   // Start the serial monitor to show output
   Serial.begin(115200);
+  // 初始化I2C通信
+  Wire.begin();
   // 设置引脚模式
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
@@ -31,6 +33,7 @@ void loop() {
   // check for messages from the broker and ensuring that any outgoing messages are sent.
   client.loop();
   measure_distance();
+  measure_sht30();
 
   sendmqtt();
 

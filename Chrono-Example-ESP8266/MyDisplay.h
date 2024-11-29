@@ -1,13 +1,13 @@
 // edit this for the light you are connecting to
 // char mqtt_topic_demo[] = "student/CASA0014/light/18/brightness/";
-char mqtt_topic_pixel[] = "student/CASA0014/light/20/pixel/";            // used to control individual pixels on the ring
-char mqtt_topic_all[] = "student/CASA0014/light/20/all/";                // used to control all LED's in one go
-char mqtt_topic_brightness[] = "student/CASA0014/light/20/brightness/";  // used to set the brightness of all the LED's 
-char mqtt_topic_demo[] = "student/CASA0014/light/20/demo/";            // used to control individual pixels on the ring
-char mqtt_topic_fire[] = "student/CASA0014/light/20/fire/";            // used to control individual pixels on the ring
+char mqtt_topic_pixel[] = "student/CASA0014/light/3/pixel/";            // used to control individual pixels on the ring
+char mqtt_topic_all[] = "student/CASA0014/light/3/all/";                // used to control all LED's in one go
+char mqtt_topic_brightness[] = "student/CASA0014/light/3/brightness/";  // used to set the brightness of all the LED's 
+char mqtt_topic_demo[] = "student/CASA0014/light/3/demo/";            // used to control individual pixels on the ring
+char mqtt_topic_fire[] = "student/CASA0014/light/3/fire/";            // used to control individual pixels on the ring
 
-int DisplayColor = 0;
 int Brightness[12] = {1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
+
 const int R_0 = 127, G_0 = 0, B_0 = 255;// 紫色
 const int R_1 = 0, G_1 = 72, B_1 = 255;
 const int R_2 = 0, G_2 = 127, B_2 = 255;
@@ -20,9 +20,11 @@ const int R_8 = 255, G_8 = 127, B_8 = 0;
 const int R_9 = 255, G_9 = 0, B_9 = 0; // 红色
 int R_CDK = 0, G_CDK = 0, B_CDK = 0;
 int Dis_CDK = 0; // 1 for distance smaller than 60, 0 for distance larger... 
+float Level_HI[10] = {75.0000, 78.1111, 81.2222, 84.3333, 87.4444, 90.5556, 93.6667, 96.7778, 99.8889, 104.0000};
+int DisplayColor = 0;
 
 // 当检测到CO2浓度下降时，逆时针旋转；浓度上升，顺时针旋转
-int DisplayDirection = 0; // 0 for Counter Clock Wise; 1 for Clock Wise
+int DisplayDirection = 0; // 0 for Counter Clock Wise; 1 for Clock Wise ; 11451 for not move
 
 // 函数：右移数组
 void rotateRight(int arr[], int size) {
@@ -57,7 +59,8 @@ void setbrightness(){
   // 根据输入方向执行相应的旋转操作
   if (DisplayDirection == 0) {
       rotateRight(Brightness, 12);  // 右移
-  } else {
+  } 
+  else if (DisplayDirection == 1){
       rotateLeft(Brightness, 12);   // 左移
   }
 }
@@ -102,10 +105,10 @@ void setcolor(){
 }
 
 void sendmqtt(){
-  DisplayColor++;
-  if (DisplayColor > 9){
-    DisplayColor = 0;
-  }
+  // DisplayColor++;
+  // if (DisplayColor > 9){
+  //   DisplayColor = 0;
+  // }
   setbrightness();
   setcolor();
 
@@ -157,4 +160,88 @@ void measure_distance(){
   else{
     Dis_CDK = 0;
   }
+}
+
+// SHT30传感器的I2C地址
+#define Addr_SHT30 0x44
+
+// 存储SHT30测量数据的变量
+uint8_t sht30_data[6];
+float sht30_cTemp;     // 摄氏温度
+float sht30_fTemp;     // 华氏温度
+float sht30_humidity;  // 相对湿度
+float sht_HI = 0;
+float sht_HI_old = 0;
+
+void measure_sht30() {
+  // 发送测量命令 0x2C06
+  Wire.beginTransmission(Addr_SHT30);
+  Wire.write(0x2C);
+  Wire.write(0x06);
+  Wire.endTransmission();
+  delay(50);  // 等待SHT30测量完成
+
+  // 请求获取6字节的数据
+  Wire.requestFrom(Addr_SHT30, 6);
+
+  // 读取6字节的数据
+  if (Wire.available() == 6) {
+    sht30_data[0] = Wire.read();
+    sht30_data[1] = Wire.read();
+    sht30_data[2] = Wire.read();  // CRC校验数据，目前未用
+    sht30_data[3] = Wire.read();
+    sht30_data[4] = Wire.read();
+    sht30_data[5] = Wire.read();  // CRC校验数据，目前未用
+  } else {
+    Serial.println("数据读取失败，请检查传感器连接！");
+    return;
+  }
+
+  // 计算温度和湿度
+  sht30_cTemp = ((((sht30_data[0] * 256.0) + sht30_data[1]) * 175) / 65535.0) - 45;
+  sht30_fTemp = (sht30_cTemp * 1.8) + 32;
+  sht30_humidity = ((((sht30_data[3] * 256.0) + sht30_data[4]) * 100) / 65535.0);
+
+  // 输出数据到串口
+  Serial.print("相对湿度：");
+  Serial.print(sht30_humidity);
+  Serial.println(" %RH");
+  Serial.print("摄氏度温度：");
+  Serial.print(sht30_cTemp);
+  Serial.println(" C");
+  Serial.print("华氏度温度：");
+  Serial.print(sht30_fTemp);
+  Serial.println(" F");
+
+  sht_HI = sht30_fTemp + 0.55 * (1 - (sht30_humidity / 100)) * (sht30_fTemp - 58);
+  Serial.print("热量湿度指数");
+  Serial.println(sht_HI);
+
+  for (int i = 0; i < 9; i++) {
+    if (sht_HI >= Level_HI[9]){
+      DisplayColor  = 9;
+      break;
+    }
+    if (sht_HI <= Level_HI[1]){
+      DisplayColor  = 0;
+      break;
+    }
+    if (sht_HI >= Level_HI[i] && sht_HI < Level_HI[i + 1]) {
+      DisplayColor  = i;  // 返回区间对应的颜色编号（0-9）
+      break;
+    } 
+  }
+  Serial.print("现在的颜色: ");
+  Serial.println(DisplayColor);
+
+  if (sht_HI_old < sht_HI - 0.1){
+    DisplayDirection = 0;
+  }
+  else if (sht_HI_old > sht_HI + 0.1){
+    DisplayDirection = 1;
+  }
+  else{
+    DisplayDirection = 11451;
+  }
+  sht_HI_old = sht_HI;
 }
