@@ -4,9 +4,14 @@
 void setup() {
   // Start the serial monitor to show output
   Serial.begin(115200);
-  delay(100);
+  // 设置引脚模式
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  // 确保 TRIG_PIN 初始为低电平
+  digitalWrite(TRIG_PIN, LOW);
+  delay(500);
 
-  WiFi.setHostname("Lumina ucjtdjw");
+  WiFi.setHostname("Lumina 114514cdk");
   startWifi();
   client.setServer(mqtt_server, mqtt_port);
   Serial.println("setup complete");
@@ -25,11 +30,11 @@ void loop() {
   }
   // check for messages from the broker and ensuring that any outgoing messages are sent.
   client.loop();
+  measure_distance();
 
   sendmqtt();
 
   Serial.println("Loop++ Loop++ Loop++ ");
-  delay(300);
+  delay(500);
 }
-
 

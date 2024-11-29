@@ -1,10 +1,10 @@
 // edit this for the light you are connecting to
 // char mqtt_topic_demo[] = "student/CASA0014/light/18/brightness/";
-char mqtt_topic_pixel[] = "student/CASA0014/light/18/pixel/";            // used to control individual pixels on the ring
-char mqtt_topic_all[] = "student/CASA0014/light/18/all/";                // used to control all LED's in one go
-char mqtt_topic_brightness[] = "student/CASA0014/light/18/brightness/";  // used to set the brightness of all the LED's 
-char mqtt_topic_demo[] = "student/CASA0014/light/18/demo/";            // used to control individual pixels on the ring
-char mqtt_topic_fire[] = "student/CASA0014/light/18/fire/";            // used to control individual pixels on the ring
+char mqtt_topic_pixel[] = "student/CASA0014/light/20/pixel/";            // used to control individual pixels on the ring
+char mqtt_topic_all[] = "student/CASA0014/light/20/all/";                // used to control all LED's in one go
+char mqtt_topic_brightness[] = "student/CASA0014/light/20/brightness/";  // used to set the brightness of all the LED's 
+char mqtt_topic_demo[] = "student/CASA0014/light/20/demo/";            // used to control individual pixels on the ring
+char mqtt_topic_fire[] = "student/CASA0014/light/20/fire/";            // used to control individual pixels on the ring
 
 int DisplayColor = 0;
 int Brightness[12] = {1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -19,6 +19,7 @@ const int R_7 = 255, G_7 = 255, B_7 = 0;
 const int R_8 = 255, G_8 = 127, B_8 = 0;
 const int R_9 = 255, G_9 = 0, B_9 = 0; // 红色
 int R_CDK = 0, G_CDK = 0, B_CDK = 0;
+int Dis_CDK = 0; // 1 for distance smaller than 60, 0 for distance larger... 
 
 // 当检测到CO2浓度下降时，逆时针旋转；浓度上升，顺时针旋转
 int DisplayDirection = 0; // 0 for Counter Clock Wise; 1 for Clock Wise
@@ -113,7 +114,7 @@ void sendmqtt(){
 
   for (int i = 0; i <= 11; i++){
     //  sprintf(mqtt_message, "{\"pixelid\": %d, \"R\": 0, \"G\": 255, \"B\": 0, \"W\": 200}", i);
-    sprintf(mqtt_message, "{\"pixelid\": %d, \"R\": %d, \"G\": %d, \"B\": %d, \"W\": %d}", i, R_CDK*Brightness[i], G_CDK*Brightness[i], B_CDK*Brightness[i], 0);
+    sprintf(mqtt_message, "{\"pixelid\": %d, \"R\": %d, \"G\": %d, \"B\": %d, \"W\": %d}", i, R_CDK*Brightness[i]*Dis_CDK, G_CDK*Brightness[i]*Dis_CDK, B_CDK*Brightness[i]*Dis_CDK, 10);
     Serial.println(mqtt_topic_pixel);
     Serial.println(mqtt_message);
     if (client.publish(mqtt_topic_pixel, mqtt_message)){
@@ -123,4 +124,37 @@ void sendmqtt(){
     }
   }
 
+}
+
+#define TRIG_PIN 12   // 触发引脚 D6
+#define ECHO_PIN 13   // 回声引脚 D7
+long distance = 114;
+
+void measure_distance(){
+  // 发送触发信号
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);  // 等待 2 微秒
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10); // 发送 10 微秒的脉冲
+  digitalWrite(TRIG_PIN, LOW);
+
+  // 读取回声信号
+  long duration = pulseIn(ECHO_PIN, HIGH); // 返回的是回声信号持续时间，单位：微秒
+
+  // 计算距离，速度假定为 343 m/s (20°C)
+  // 公式：distance = (duration * speed_of_sound) / 2
+  // 其中，duration 是脉冲往返的时间，speed_of_sound = 34300 cm/s
+  distance = (duration * 0.0343) / 2;
+
+  // 输出距离到串口
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  if (distance <= 60){
+    Dis_CDK = 1;
+  }
+  else{
+    Dis_CDK = 0;
+  }
 }
