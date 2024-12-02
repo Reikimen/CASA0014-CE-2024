@@ -34,8 +34,11 @@ If the user is seated, the Chrono Lumina Light illuminates and calculates the Te
 >
 > [Temperature Humidity Index (THI) Calculator Online](https://www.erp-information.com/calculators/temperature-humidity-index-thi-calculator?utm_content=cmp-true)
 
+
+
 ### Materials for "Heat Alert"
 
+```json
 ESP8266 Dev Board x 1
 
 Chrono Lumina Light x 1
@@ -45,12 +48,15 @@ HC-SR04 x 1 (for detecting distance)
 SHT30 x 1 (for temp and humidity)
 
 Dupont x several
+```
+
+
 
 ### The Design of "Heat Alert"
 
 #### The Repo Structure
 
-```plaintext
+```json
 - Sensor-Sys/
             - Chrono-Dankao-ESP8266/
                         - Chrono-Dankao-ESP8266.ino
@@ -70,23 +76,23 @@ Dupont x several
 
 **The repo contains the following components:**
 
-- Chrono-Dankao-ESP8266/
-	
-	- The main program folder, opened with an Arduino and burned into the ESP8266 
-	
-- CASA0014-v1.0.f3d
-	
-	- Autodesk Fusion 360 File for "Heat Alert"
-	
-- Components/
-	
-	- Components folder, which contains how to use each component, some of the improved non-blocking runtime programs, and programs for checking circuit connections (e.g., items for checking the connection of I2C devices: I2C_address_search)
-	
-- images/
-	
-	- For storing images in the README
-	
-- README.md
+> - Chrono-Dankao-ESP8266/
+>
+> 	- The main program folder, opened with an Arduino and burned into the ESP8266 
+>
+> - CASA0014-v1.0.f3d
+>
+> 	- Autodesk Fusion 360 File for "Heat Alert"
+>
+> - Components/
+>
+> 	- Components folder, which contains how to use each component, some of the improved non-blocking runtime programs, and programs for checking circuit connections (e.g., items for checking the connection of I2C devices: I2C_address_search)
+>
+> - images/
+>
+> 	- For storing images in the README
+>
+> - README.md
 
 #### Main program folder - Chrono-Dankao-ESP8266/
 
@@ -142,6 +148,16 @@ Here is an overview of what each file in the main program does:
 
 #### The workflow of "Heat Alert"
 
+(The working principle)
+
+
+
+
+
+
+
+
+
 
 
 #### Pin Allocation, Circuit and Modeling
@@ -152,14 +168,23 @@ Here is an overview of what each file in the main program does:
 
 ##### Circuit Design:
 
+(The Circuit Design)
+
+
+
+
+
 
 
 ##### Modeling:
 
 <img src="/image/modeling.png" alt="modeling" style="zoom: 50%;" />
 
+
+
 ### Challenges and Limitations
 
+(Reflection)
 
 
 
@@ -171,6 +196,5 @@ Here is an overview of what each file in the main program does:
 
 
 
-
-
+## What other contributions can we make to society through the technologies employed in this project?
 
