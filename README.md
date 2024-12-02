@@ -50,15 +50,113 @@ Dupont x several
 
 #### The Repo Structure
 
+```plaintext
+- Sensor-Sys/
+            - Chrono-Dankao-ESP8266/
+                        - Chrono-Dankao-ESP8266.ino
+                        - MyDisplay.h
+                        - WiFi-MQTT-Connection.h
+            - CASA0014-v1.0.f3d
+            - Components/
+                        - HC-SR04/..
+                        - SHT30-org-from-2023/..
+                        - ...
+            - images/
+                        - HeatAlert-cut.jpg
+                        - ESP8266-Pins.png
+                        - ...
+            - README.md
+```
+
+**The repo contains the following components:**
+
+- Chrono-Dankao-ESP8266/
+	
+	- The main program folder, opened with an Arduino and burned into the ESP8266 
+	
+- CASA0014-v1.0.f3d
+	
+	- Autodesk Fusion 360 File for "Heat Alert"
+	
+- Components/
+	
+	- Components folder, which contains how to use each component, some of the improved non-blocking runtime programs, and programs for checking circuit connections (e.g., items for checking the connection of I2C devices: I2C_address_search)
+	
+- images/
+	
+	- For storing images in the README
+	
+- README.md
+
+#### Main program folder - Chrono-Dankao-ESP8266/
+
+Here is an overview of what each file in the main program does:
+
+> ##### Chrono-Dankao-ESP8266.ino
+>
+> - Initialization (including sensor, network and display).
+>
+> - Timed reading of sensor data.
+>
+> - Calling functions of other modules (e.g. Wi-Fi status check, connect, reconnect, distance measurement, temperature and humidity detection) to realize the main logic of the project.
+>
+> 	
+>
+> ##### WiFi-MQTT-Connection.h
+>
+> - Wi-Fi  and MQTT Configuration
+>
+> - **Main Functions:**
+>
+> 	- `startWifi()`: connects to Wi-Fi.
+>
+> 	- `reconnectMQTT()`: Ensure the MQTT connection is stable and reconnect automatically if necessary.
+>
+> 	- `callback()`: process incoming MQTT messages.
+>
+> 		
+>
+> ##### MyDisplay.h (Display & Perception Logic)
+>
+> - Sensor data reading and processing:
+>
+> 	- Temperature and humidity are measured using the SHT30 sensor and the Temp-Humdity Index (THI) is calculated using a formula.
+> 	- The display color (`DisplayColor`) and rotation direction (`DisplayDirection`) are determined based on the Heat Index.
+>
+> - MQTT message sending:
+>
+> 	- Send light status (color, brightness, pixel status) to the server via MQTT.
+>
+> - Distance Measurement:
+>
+> 	- Measure the distance between the object and the sensor using the ultrasonic sensor (trigger pin and echo pin) and control the display according to the threshold.
+>
+> - **Main functions:**
+> 	- `measure_sht30()`: handles temperature and humidity measurement and color selection logic.
+> 	- `measure_distance()`: measure object distance.
+> 	- `sendmqtt()`: send light control data.
+> 	- `setbrightness()` and `setcolor()`: set brightness and color for pixels.
+>
+
 
 
 #### The workflow of "Heat Alert"
 
 
 
-#### Pin Circuit and Modeling
+#### Pin Allocation, Circuit and Modeling
+
+##### Pin Allocation:
+
+<img src="/image/ESP8266-Pins.png" alt="ESP8266-Pins" style="zoom:50%;" />
+
+##### Circuit Design:
 
 
+
+##### Modeling:
+
+<img src="/image/modeling.png" alt="modeling" style="zoom: 50%;" />
 
 ### Challenges and Limitations
 
