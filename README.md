@@ -56,7 +56,7 @@ Dupont x several
 
 #### The Repo Structure
 
-```json
+```plaintext
 - Sensor-Sys/
             - Chrono-Dankao-ESP8266/
                         - Chrono-Dankao-ESP8266.ino
