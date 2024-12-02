@@ -1,8 +1,10 @@
+---
 typora-root-url: ./
+---
 
 # Heat Alert — Project for CASA0014
 
-![HeatAlert-cut](C:\Users\19625\Documents\GitHub\CASA0014-CE-2024\image\HeatAlert-cut.jpg)
+![HeatAlert-cut](/image/HeatAlert-cut.jpg)
 
 ("Heat Alert" is the little frog-shaped ornament pictured above.)
 
