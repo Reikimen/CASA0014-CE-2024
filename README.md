@@ -24,15 +24,25 @@ After reflecting on this experience, an idea came to my mind: Is it possible to 
 
 The frog-shaped ornament can be placed in front of a desk to automatically detect seat occupancy and indicate the comfort level of the current study or office environment through the Chrono Lumina Light. 
 
-If the user is seated, the Chrono Lumina Light illuminates and calculates the Temperature-Humidity Index (THI) based on temperature and humidity, which is classified into ten levels. The THI value is displayed in a gradient of colors from low to high, ranging from violet and cyan to orange-red and red. The direction of rotation of the light ring reflects changes in the environment: as the HI decreases, the ring rotates clockwise, indicating improved environmental conditions; as the HI increases, the ring rotates counterclockwise, indicating deteriorated environmental conditions.
+If the user is seated, the Chrono Lumina Light illuminates and calculates the **Temperature-Humidity Index (THI)** based on temperature and humidity, which is classified into ten levels. The THI value is displayed in a gradient of colors from low to high, ranging from violet and cyan to orange-red and red. 
 
-> What's Temperature-Humidity Index? — Temperature-Humidity Index is used for indicate the level of stress and discomfort experienced by individuals.
+**The direction of rotation of the light ring reflects changes in the environment:** as the THI decreases, the ring rotates clockwise, indicating improved environmental conditions; as the THI increases, the ring rotates counterclockwise, indicating deteriorated environmental conditions. 
+
+This is an example demonstration of a THI rising and then falling correspondence: [Showcase.qt](image/Showcase.qt) 
+
+
+
+> **What's Temperature-Humidity Index?** — Temperature-Humidity Index is used for indicate the level of stress and discomfort experienced by individuals:
+>
+> ​	***THI = Tdb – [0.55 – (0.55 x RH/100)] x (Tdb – 58)***
 >
 > Here are some refer websites and files.
 >
 > [How Do I Determine?: How do I calculate Temperature-Humidity Index (THI)? - | Ag Proud](https://www.agproud.com/articles/27297-how-do-i-determine-how-do-i-calculate-temperature-humidity-index-thi)
 >
 > [Temperature Humidity Index (THI) Calculator Online](https://www.erp-information.com/calculators/temperature-humidity-index-thi-calculator?utm_content=cmp-true)
+
+<img src="/image/Weather_Hazard_Guide.png" alt="Weather_Hazard_Guide" style="zoom: 40%;" />
 
 
 
@@ -113,66 +123,57 @@ Here is an overview of what each file in the main program does:
 > - Wi-Fi  and MQTT Configuration
 >
 > - **Main Functions:**
->
-> 	- `startWifi()`: connects to Wi-Fi.
->
-> 	- `reconnectMQTT()`: Ensure the MQTT connection is stable and reconnect automatically if necessary.
->
-> 	- `callback()`: process incoming MQTT messages.
+>- `startWifi()`: connects to Wi-Fi.
+> 	
+>- `reconnectMQTT()`: Ensure the MQTT connection is stable and reconnect automatically if necessary.
+> 	
+>- `callback()`: process incoming MQTT messages.
+> 
 >
 > 		
->
-> ##### MyDisplay.h (Display & Perception Logic)
->
-> - Sensor data reading and processing:
->
-> 	- Temperature and humidity are measured using the SHT30 sensor and the Temp-Humdity Index (THI) is calculated using a formula.
+>##### MyDisplay.h (Display & Perception Logic)
+> 
+>- Sensor data reading and processing:
+> 
+>	- Temperature and humidity are measured using the SHT30 sensor and the Temp-Humdity Index (THI) is calculated using a formula.
 > 	- The display color (`DisplayColor`) and rotation direction (`DisplayDirection`) are determined based on the Heat Index.
->
-> - MQTT message sending:
->
-> 	- Send light status (color, brightness, pixel status) to the server via MQTT.
->
-> - Distance Measurement:
->
-> 	- Measure the distance between the object and the sensor using the ultrasonic sensor (trigger pin and echo pin) and control the display according to the threshold.
->
-> - **Main functions:**
+> 
+>- MQTT message sending:
+> 
+>	- Send light status (color, brightness, pixel status) to the server via MQTT.
+> 
+>- Distance Measurement:
+> 
+>	- Measure the distance between the object and the sensor using the ultrasonic sensor (trigger pin and echo pin) and control the display according to the threshold.
+> 
+>- **Main functions:**
 > 	- `measure_sht30()`: handles temperature and humidity measurement and color selection logic.
 > 	- `measure_distance()`: measure object distance.
 > 	- `sendmqtt()`: send light control data.
 > 	- `setbrightness()` and `setcolor()`: set brightness and color for pixels.
->
+> 
 
 
 
 #### The workflow of "Heat Alert"
 
-(The working principle)
+<img src="/image/HeatAlert-LoopWorkflow.png" alt="HeatAlert-LoopWorkflow" style="zoom:60%;" />
 
+First, the project is powered up (Initialisation), the ESP8266 is powered on, connected to Wi-Fi and MQTT server (and their connectivity is checked periodically), and the ultrasonic sensor (HC-SR04) and the temperature and humidity sensor (SHT30) are initialised. 
 
-
-
-
-
-
-
+After initialisation, if the user is detected in front of the table, it proceeds into environmental monitoring; if it is not detected, it remains in standby. SHT30 collects temperature and humidity data and is used to calculate the THI. The colour reflects the comfort level of the environment and the direction of rotation reflects the trend of the comfort level.
 
 
 
 #### Pin Allocation, Circuit and Modeling
 
-##### Pin Allocation:
+##### Pin Allocation & Circuit Design:
 
 <img src="/image/ESP8266-Pins.png" alt="ESP8266-Pins" style="zoom:50%;" />
 
-##### Circuit Design:
+The above figure shows the pinout of the ESP8266, and the following figure shows the corresponding circuit connections:
 
-(The Circuit Design)
-
-
-
-
+![Connection](/image/Connection.jpg)
 
 
 
@@ -180,21 +181,53 @@ Here is an overview of what each file in the main program does:
 
 <img src="/image/modeling.png" alt="modeling" style="zoom: 50%;" />
 
-
-
-### Challenges and Limitations
-
-(Reflection)
+In fact, the above design ignores the problem of placing the ultrasonic sensor into the mould. Therefore, in the actual prototype, it is required to carefully saw off the raised part at the back of the mould, then paste the sawed off part back after placing the ultrasonic transducer in the mould. This is a small design error that can be easily (and should be) fixed in future developments.
 
 
 
+## What other contributions can we make to society through the (IoT) technologies employed in this project?
 
 
 
+### IoT in Built Environments
+
+**Environmental comfort monitoring:** Some smart air conditioners (e.g. Midea's i+ air conditioning system) are able to adjust the temperature and humidity automatically based on indoor data, providing a comfortable indoor environment while reducing energy consumption.
+
+**Smart Cities:** Smart transport, waste management and public lighting optimisation, for example. London's smart traffic light system adjusts signal durations based on real- time traffic flow, reducing congestion and carbon emissions.
+
+**Healthcare applications:** IoT devices such as the Apple Watch and the Xiaomi sports bracelet, which have very useful functions such as monitoring heart rate and steps, and wearable devices to monitor user health data.
 
 
 
+### IoT in Natural Environments
+
+**Wildlife conservation**: For example, the ‘BAT BOX’ built by UCL and Intel at Elizabeth Park monitors wildlife activity and provides data to support conservation efforts.
+
+**Agriculture**: Helping farmers to optimise irrigation and fertiliser application, reduce resource wastage and increase yields. Israel has developed an IoT-based precision drip irrigation system.
 
 
-## What other contributions can we make to society through the technologies employed in this project?
 
+### Socio-Technical Scenarios
+
+**Smart Home and Accessible Design**: Smart home devices help people with disabilities more easily do their daily activities, such as controlling lights or opening doors with voice commands (e.g. Xiaomi's Smart Home).
+
+**Energy Efficiency**: Using IoT technology to optimise energy distribution in the smart grid in real time - China Southern Power Grid has deployed IoT smart meters in a number of cities to visualise and dynamically regulate electricity consumption data.
+
+**Community Resilience**: IoT devices such as air quality sensors help communities identify sources of pollution and develop countermeasures. For example, Beijing's network of PM2.5 sensors helps citizens understand air pollution and adjust their outdoor activities. 
+
+
+
+## Challenges and Limitations (Reflection)
+
+Although the project went quite smoothly and successfully implemented most of the designed features, this project still has its limitations:
+
+1. **Energy Consumption**
+   Continuously running sensors and lighting systems may result in high energy consumption, especially when used for long periods of time.
+
+2. **User experience**
+
+   The Thermal Comfort Index (THI) needs to be visually presented to the user through colour and direction of rotation. However, the colour is perceived and understood differently by different groups of people, which may affect the effectiveness of the information conveyed.
+
+3. **User Privacy and Security**
+
+   The MQTT protocol itself does not mandate encryption or authentication, which allows attackers to easily intercept unencrypted communication content, leading to sensitive data leakage.

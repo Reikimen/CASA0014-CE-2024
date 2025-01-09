@@ -1,0 +1,12 @@
+# Ignore Secret.h file
+Secret.h
+
+# If Secret.h is in a specific folder (e.g., include/)
+# Uncomment and use the line below instead:
+# include/Secret.h
+
+# Optional: Ignore other potential sensitive files
+*.key
+*.crt
+*.pem
+*.env

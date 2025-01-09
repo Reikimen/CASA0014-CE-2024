@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include <ESP8266WiFi.h>          // Wi-Fi library for ESP8266
 #include <PubSubClient.h>         // Lib for MQTT
+#include "Secret.h"
 #include "WiFi-MQTT-Connection.h"
 #include "MyDisplay.h"
 

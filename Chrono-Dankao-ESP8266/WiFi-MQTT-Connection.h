@@ -1,8 +1,3 @@
-#define SECRET_SSID "CE-Hub-Student"
-#define SECRET_PASS "casa-ce-gagarin-public-service"
-#define SECRET_MQTTUSER "student"
-#define SECRET_MQTTPASS "ce2021-mqtt-forget-whale";
-
 const char* ssid          = SECRET_SSID;
 const char* password      = SECRET_PASS;
 const char* mqtt_username = SECRET_MQTTUSER;
